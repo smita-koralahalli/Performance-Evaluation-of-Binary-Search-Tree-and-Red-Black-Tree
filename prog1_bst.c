@@ -13,7 +13,7 @@ typedef struct node {
 }node;
 
 
-
+/*********Insertion Function*******************/
 struct node *insert ( struct node *tree, int key)
 {
   
@@ -39,7 +39,7 @@ struct node *insert ( struct node *tree, int key)
     tree->right = insert ( tree->right, key);
   
   }
-  printf("%d(%d)--> ", tree->data, tree->count);
+  
   return tree;
 }
 
@@ -103,6 +103,18 @@ int bst_height(struct node *tree)
 }
 
 
+void inorderTree(struct node *tree){
+struct node* temp = tree;
+if (temp != NULL){
+    inorderTree(temp->left);
+    
+    printf("%d(%d) --> ",temp->data, temp->count);
+    inorderTree(temp->right);
+}
+return;
+}
+
+
 int main ( void )
 {
   struct node *tree = NULL;
@@ -110,7 +122,7 @@ int main ( void )
   int b=1;
   
   
-  srand(time(NULL));
+  //srand(time(NULL));
   for ( i = 0; i < 500; i++ )
   {
   	int x=rand() % 100+1;
@@ -118,8 +130,8 @@ int main ( void )
   	tree = insert ( tree, x);
        
   }
- 
-  
+  printf("\nInorder Traversal : number(count)\n");
+  inorderTree(tree);
   while(b<=100)
   {
   	match=1;
