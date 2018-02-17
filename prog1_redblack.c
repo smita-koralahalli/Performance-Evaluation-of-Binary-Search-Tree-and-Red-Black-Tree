@@ -3,35 +3,34 @@
 #include <time.h>
 
 
-int match;
-int a=0;
+int match;							//key comparisons//
+int sum=0;	
 
-typedef struct rbtNode{
+typedef struct node{
 int key;
-char color;
-struct rbtNode *left;
-struct rbtNode *right;
-struct rbtNode *parent;
+char color;						        //count for repeating values//
+struct node *left;
+struct node *right;
+struct node *parent;
 int count;
+}node;
 
-}rbtNode;
+struct node* root = NULL;
 
-
-struct rbtNode* root = NULL;
-
-void leftRotate(struct rbtNode *x)
+/*************Left Rotate************/
+void leftRotate(struct node *x)
 {
 
-	struct rbtNode *y;
-	y = x->right;  //Set y
-	x->right = y->left; // Turn y's left subtree into x's right subtree
+	struct node *y;
+	y = x->right;  						//Set y
+	x->right = y->left; 					// Initialize y's left subtree into x's right subtree
 
 	if( y->left != NULL)
 	{
-    		y->left->parent = x; //Bridge the y's left sublink
+    		y->left->parent = x; 				//Connect the y's left sublink
 	}
 
-	y->parent = x->parent; //Bridge x's old parent and y's parent
+	y->parent = x->parent; 					//Connect x's old parent and y's parent
 	
 	if( x->parent == NULL)
 	{
@@ -39,29 +38,30 @@ void leftRotate(struct rbtNode *x)
 	}
 	else if((x->parent->left!=NULL) && ( x->key == x->parent->left->key))
 	{
-    		x->parent->left = y; //Bridge x's old parent's left or right child
+    		x->parent->left = y; 				//Connect x's old parent's left or right child
 	}
 
 	else x->parent->right = y;
-	y->left = x; //put x on y's left
-	x->parent = y; //Take care of x's parent
+	y->left = x; 						//put x on y's left
+	x->parent = y; 						// x's parent
 
 	return;
 }
 
 
-void rightRotate(struct rbtNode *y)
+/*************Right Rotate************/
+void rightRotate(struct node *y)
 {
-	struct rbtNode *x;
-	x = y->left; //set x
-	y->left = x->right; //Turn x's right subtree into y's left subtree
+	struct node *x;
+	x = y->left; 						//set x
+	y->left = x->right; 					//Turn x's right subtree into y's left subtree
 
 	if ( x->right != NULL)
 	{
     		x->right->parent = y;
 	}
 
-	x->parent = y->parent; //Bridge y's old parent and x's parent
+	x->parent = y->parent; 					//Connect y's old parent and x's parent
 	if( y->parent == NULL)
 	{
     		root = x;
@@ -69,21 +69,26 @@ void rightRotate(struct rbtNode *y)
 
 	else if((y->parent->left!=NULL) && ( y->key == y->parent->left->key))	
 	{
-    		y->parent->left = x; //Bridge y's old parent's left or right child
+    		y->parent->left = x; 				//Connect y's old parent's left or right child
 	}
 
 	else y->parent->right = x;
-	x->right = y; //put y on x's right
-	y->parent = x; //Take care of y's parent
+	x->right = y; 						//put y on x's right
+	y->parent = x; 						//Take care of y's parent
 
 	return;
 
 }
 
+/***********Perform operations to fix the node***************/
+//If parent black exit//
+//If parent red
+//a.Red sibling: Change color//
+//b.Black or absent sibling: Rotate and recolor//
 
-void rbInsertFix(struct rbtNode *z)
+void insertFix(struct node *z)
 {
-	struct rbtNode *y=NULL;
+	struct node *y=NULL;
 	while((z->parent!=NULL) && (z->parent->color == 'r'))
 	{
     		if ((z->parent->parent->left!=NULL) && (z->parent->key == z->parent->parent->left->key))
@@ -147,11 +152,11 @@ void rbInsertFix(struct rbtNode *z)
 
 
 
-
-void rbInsert(int val)
+/***********Insert operation*********************/
+void insert(int val)
 {
-	struct rbtNode *x, *y;
-	struct rbtNode *z = (struct rbtNode*)malloc(sizeof(struct rbtNode));
+	struct node *x, *y;
+	struct node *z = (struct node*)malloc(sizeof(struct node));
 	z->key = val;
 	z->left = NULL;
 	z->right = NULL;
@@ -160,7 +165,7 @@ void rbInsert(int val)
 	
 	
 
-	if ( root == NULL )
+	if ( root == NULL )                                 // root insertion and setting color to black//
 	{
 		
     		root = z;
@@ -171,7 +176,7 @@ void rbInsert(int val)
 	}
         
         
-        else if (root!=NULL)
+        else if (root!=NULL)				    // same element found in root just increment count//
 	{
         	if(z->key==root->key){
 		root->count++;
@@ -181,7 +186,7 @@ void rbInsert(int val)
        
 	
 	
-	while ( x != NULL)
+	while ( x != NULL)				    // subsequent node insertion and increment//
 	{
                 
     		y = x;
@@ -232,7 +237,7 @@ void rbInsert(int val)
 
 	
 	
-	rbInsertFix(z);
+	insertFix(z);
 
 	
 
@@ -241,16 +246,16 @@ void rbInsert(int val)
 
 
 
-
+/***********Search operation*********************/
 
 int search(int val)
 {
-	struct rbtNode* temp=root;
+	struct node* temp=root;
 	int diff;
 
 	while(temp!=NULL)
 	{
-	 	diff=val - temp->key;
+	 	diff=val - temp->key;                               //calculate diff with key and value and traverse//
 		
 		if(diff>0)
 		{
@@ -268,8 +273,8 @@ int search(int val)
 		{
 			
 			printf("\n\nElement to be searched is %d and its height is %d with count: %d\n",temp->key, match, temp->count+1);
-        		a+=(temp->count+1)*match;
-        		printf("\nSum=%d\n",a);
+        		sum+=(temp->count+1)*match;
+        		printf("\nSum=%d\n",sum);
         		return 1;
 		}
 		}
@@ -278,14 +283,15 @@ int search(int val)
 }
 
 
-int bst_height(struct rbtNode *root)
+/*********Height*******************/
+int rbt_height(struct node *root)
 {
     int tmp1=0;
     int tmp2=0;
     if (root)
     {
-        tmp1 = bst_height(root->left);
-        tmp2 = bst_height(root->right);
+        tmp1 = rbt_height(root->left);
+        tmp2 = rbt_height(root->right);
         if (tmp1>tmp2)
             return tmp1+1;
 	    
@@ -296,12 +302,13 @@ int bst_height(struct rbtNode *root)
     }
 }
 
-void inorderTree(struct rbtNode* root){
-struct rbtNode* temp = root;
+/*********In-Order Traversal*******************/
+void inorderTree(struct node* root){
+struct node* temp = root;
 
 if (temp != NULL){
     inorderTree(temp->left);
-    printf("%d(%d) - %c --> ",temp->key, temp->count+1, temp->color);
+    printf("%d-%d - %c\t\t ",temp->key, temp->count+1, temp->color);
     inorderTree(temp->right);
 }
 return;
@@ -310,20 +317,20 @@ return;
 
 int main ( void )
 {
-  struct rbtNode *tree = NULL;
-  int i, n = 0;
+  struct node *tree = NULL;
+  int i;
   int b=1;
   
-  
+//function for different random numbers for each iteration; commented for same sequence for both binary search tree and red black tree// 
   //srand(time(NULL));
   for ( i = 0; i < 500; i++ )
   {
   	int x=rand() % 100+1;
  	printf("\nElement inserted:%d\n",x);
-  	rbInsert (x);
+  	insert (x);
        
   }
-     printf("\nInorder Traversal : number(count)-tag\n");
+     printf("\nInorder Traversal : number-count-tag\n");
      inorderTree(root);
   
   while(b<=100)
@@ -334,8 +341,8 @@ int main ( void )
 
   }
 
-  printf("\n Total sum of key comparisons :%d\n",a);
-  printf("\n\n Average number of key comparisons for a successful search :%d\n\n", a/500);
-  printf("\n\nThe height of tree is :%d\n",bst_height(root));
+  printf("\n Total sum of key comparisons :%d\n",sum);
+  printf("\n\n Average number of key comparisons for a successful search :%d\n\n", sum/500);
+  printf("\n\nThe height of tree is :%d\n",rbt_height(root));
  
 }
